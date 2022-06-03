@@ -1,9 +1,10 @@
 const express = require('express');
 const morgan = require('morgan');
+const bodyParser = require('body-parser');
 
 const app = express();
 
-// add your code here
+app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 const data = [
@@ -29,7 +30,7 @@ const data = [
 
 app.get('/', (req, res) => {
     res.status(200).send({status: 'ok'});
-    });
+});
 
 app.get('/api/TodoItems', (req, res) => {
     res.status(200).send(data);
@@ -37,34 +38,25 @@ app.get('/api/TodoItems', (req, res) => {
 
 app.get('/api/TodoItems/:number', (req, res) => {
     res.status(200).send(data[req.params.number]);
-    // console.log(req.params.number);
+    console.log(data[req.params.number]);
 });
 
 app.post('/api/TodoItems', (req, res) => {
-    // res.send(req.body);
-    res = {
-        todoItemId: number,
-        name: string,
-        priority: number,
-        completed: boolean
+    res.status(201).send(req.body);
+    let index = data.findIndex(e => e.todoItemId === req.body.todoItemId);
+    index == -1 ? data.push(req.body) : data[index] = req.body;
+    for(i=0; i<data.length; i++){
+        data[i].todoItemId = i;
     };
     res.end();
 });
 
-// app.post('/api/TodoItems', (req, res) => {
-//     res.status(201).send({
-//         todoItemId: number,
-//         name: string,
-//         priority: number,
-//         completed: boolean
-//     });
-//     res.send(req.body);
-//     console.log(req.body);
-// });
-
 app.delete('/api/TodoItems/:number', (req, res) => {
-    res.send(data[req.params.number] + " will be deleted!");
-    res.status(200).delete(data[req.params.number]);
+    res.status(200).send(data[req.params.number]);
+    data.splice(req.params.number, 1);
+    for(i=0; i<data.length; i++){
+        data[i].todoItemId = i;
+    };
 });
 
 module.exports = app;
